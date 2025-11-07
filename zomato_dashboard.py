@@ -24,10 +24,13 @@ st.markdown("<h1>🍽️ Zomato Food Delivery Dashboard</h1>", unsafe_allow_html
 # ---------- Load Data ----------
 @st.cache_data
 def load_data():
-    df = pd.read_csv("zomato_restaurants.csv", encoding='latin-1')
+    @st.cache_data
+def load_data():
+    url = "https://drive.google.com/uc?export=download&id=1i_LAZ3XmZOBujgwJrjd4VWQ3NJMixpjU"
+    df = pd.read_csv(url, encoding='latin-1')
     return df
 
-df = load_data()
+
 
 # ---------- Data Cleaning ----------
 df.drop_duplicates(inplace=True)
