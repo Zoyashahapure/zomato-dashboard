@@ -24,14 +24,11 @@ st.markdown("<h1>🍽️ Zomato Food Delivery Dashboard</h1>", unsafe_allow_html
 # ---------- Load Data ----------
 @st.cache_data
 def load_data():
-    @st.cache_data
-def load_data():
     url = "https://drive.google.com/uc?export=download&id=1i_LAZ3XmZOBujgwJrjd4VWQ3NJMixpjU"
     df = pd.read_csv(url, encoding='latin-1')
     return df
-    df = load_data()
 
-
+df = load_data()
 
 # ---------- Data Cleaning ----------
 df.drop_duplicates(inplace=True)
@@ -52,10 +49,9 @@ col2.metric("⭐ Average Rating", round(df['Aggregate rating'].mean(), 2))
 col3.metric("💰 Avg Cost for Two", int(df['Average Cost for two'].mean()))
 
 # ---------- Charts ----------
-# Top cuisines
-top_cuisines = (
-    df['Cuisines'].value_counts().head(10).reset_index()
-)
+
+# 🍛 Top Cuisines
+top_cuisines = df['Cuisines'].value_counts().head(10).reset_index()
 top_cuisines.columns = ['Cuisine', 'Count']
 
 fig1 = px.bar(
@@ -65,10 +61,8 @@ fig1 = px.bar(
 )
 st.plotly_chart(fig1, use_container_width=True)
 
-# Pie chart for rating distribution
-rating_dist = (
-    df['Aggregate rating'].round().value_counts().sort_index().reset_index()
-)
+# ⭐ Rating Distribution
+rating_dist = df['Aggregate rating'].round().value_counts().sort_index().reset_index()
 rating_dist.columns = ['Rating', 'Count']
 
 fig2 = px.pie(
@@ -78,7 +72,7 @@ fig2 = px.pie(
 )
 st.plotly_chart(fig2, use_container_width=True)
 
-# Map visualization
+# 🗺️ Restaurant Map
 if {'Latitude', 'Longitude'}.issubset(df.columns):
     st.markdown("### 🗺️ Restaurant Locations")
     fig3 = px.scatter_mapbox(
@@ -89,4 +83,4 @@ if {'Latitude', 'Longitude'}.issubset(df.columns):
     )
     st.plotly_chart(fig3, use_container_width=True)
 else:
-    st.warning("Latitude/Longitude columns not found in dataset.")
+    st.warning("⚠️ Latitude/Longitude columns not found in dataset.")
