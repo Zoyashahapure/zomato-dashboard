@@ -25,14 +25,32 @@ st.markdown("<h1>🍽️ Zomato Food Delivery Dashboard</h1>", unsafe_allow_html
 @st.cache_data
 def load_data():
     url = "https://drive.google.com/uc?export=download&id=1i_LAZ3XmZOBujgwJrjd4VWQ3NJMixpjU"
-    df = pd.read_csv(url, encoding='latin-1')
-    return df
+    try:
+        df = pd.read_csv(url, encoding='latin-1', on_bad_lines='skip', low_memory=False)
+        return df
+    except Exception as e:
+        st.error(f"❌ Error loading CSV: {e}")
+        return pd.DataFrame()
 
 df = load_data()
 
+# Show preview
+if df.empty:
+    st.error("⚠️ Failed to load data. Please check the CSV link or file format.")
+    st.stop()
+
+st.write("✅ Data Preview:")
+st.dataframe(df.head())
+
 # ---------- Data Cleaning ----------
+required_cols = ['City', 'Cuisines', 'Aggregate rating', 'Average Cost for two']
+for col in required_cols:
+    if col not in df.columns:
+        st.error(f"Missing column: {col}")
+        st.stop()
+
 df.drop_duplicates(inplace=True)
-df.dropna(subset=['City', 'Cuisines', 'Aggregate rating', 'Average Cost for two'], inplace=True)
+df.dropna(subset=required_cols, inplace=True)
 
 # ---------- Sidebar Filters ----------
 st.sidebar.header("🔍 Filter Options")
@@ -49,8 +67,7 @@ col2.metric("⭐ Average Rating", round(df['Aggregate rating'].mean(), 2))
 col3.metric("💰 Avg Cost for Two", int(df['Average Cost for two'].mean()))
 
 # ---------- Charts ----------
-
-# 🍛 Top Cuisines
+# Top cuisines
 top_cuisines = df['Cuisines'].value_counts().head(10).reset_index()
 top_cuisines.columns = ['Cuisine', 'Count']
 
@@ -61,7 +78,7 @@ fig1 = px.bar(
 )
 st.plotly_chart(fig1, use_container_width=True)
 
-# ⭐ Rating Distribution
+# Pie chart for rating distribution
 rating_dist = df['Aggregate rating'].round().value_counts().sort_index().reset_index()
 rating_dist.columns = ['Rating', 'Count']
 
@@ -72,7 +89,7 @@ fig2 = px.pie(
 )
 st.plotly_chart(fig2, use_container_width=True)
 
-# 🗺️ Restaurant Map
+# Map visualization
 if {'Latitude', 'Longitude'}.issubset(df.columns):
     st.markdown("### 🗺️ Restaurant Locations")
     fig3 = px.scatter_mapbox(
@@ -83,4 +100,4 @@ if {'Latitude', 'Longitude'}.issubset(df.columns):
     )
     st.plotly_chart(fig3, use_container_width=True)
 else:
-    st.warning("⚠️ Latitude/Longitude columns not found in dataset.")
+    st.warning("Latitude/Longitude columns not found in dataset.")
