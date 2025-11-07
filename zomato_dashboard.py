@@ -29,6 +29,7 @@ def load_data():
     url = "https://drive.google.com/uc?export=download&id=1i_LAZ3XmZOBujgwJrjd4VWQ3NJMixpjU"
     df = pd.read_csv(url, encoding='latin-1')
     return df
+    df = load_data()
 
 
 
